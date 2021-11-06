@@ -375,11 +375,11 @@ class TCPSERVER(Account):
                 
                 #get cmd from Client
                 client_msg = data_enc.decode('utf-8')
-                if client_msg =='Quit':
+                if client_msg =='QUIT':
                     break
                 else:
 
-                    if client_msg!='All':
+                    if client_msg!='ALL':
 
                         #find currency 
                         object,update_time =Find_currency(full_data,client_msg)

@@ -52,24 +52,19 @@ def Specific_Currency(client_sock):  # recev one dict and print
 def Update_data(update_time): #Check and update data 
     
     #assign and get date and time
-    
     now = datetime.now()
-    date =datetime.today()
-    print(update_time)
+    date=datetime.today()
+   
     if update_time==0:
         return True
     update_time=str(update_time).split(' ')
-    print(update_time)
-    print(update_time[0].split('/'))
-    print(update_time[1].split(':'))
-    print(now)
-    print(date)
+    
     #check if 30 minutes last or not
-    if str(date.day()) == update_time[0].split('/')[0] and str(date.month()) == update_time[0].split('/')[1] and str(date.year())==update_time[0].split('/')[2]:
+    if str(date.day) == update_time[0].split('/')[0] and str(date.month) == update_time[0].split('/')[1] and str(date.year)==update_time[0].split('/')[2]:
         
-        if str(now.hour())==update_time[1].split(':')[0]:
+        if str(now.hour)==update_time[1].split(':')[0]:
             
-            if abs(int(update_time[1].split(':')[1]) - int(now.minute()))>=30:
+            if abs(int(update_time[1].split(':')[1]) - int(now.minute))>=30:
                 
                 return True
         else:
