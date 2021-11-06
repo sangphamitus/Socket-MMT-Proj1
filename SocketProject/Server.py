@@ -70,7 +70,7 @@ def Get_data_API(keys): # use keys to get api's data
     
     return full_data
 
-def Save_data_to_Json(full_data,file_name="ExchangeCurrencyRate.json"): # save data to Json file
+def Save_data_to_Json(full_data,file_name="SocketProject\ExchangeCurrencyRate.json"): # save data to Json file
 
     # get time and date
     update_time, update_date=Get_time_and_day()
@@ -81,7 +81,7 @@ def Save_data_to_Json(full_data,file_name="ExchangeCurrencyRate.json"): # save d
         out_file.write(json.dumps(full_data,indent=2))
         out_file.close()
 
-def Get_data_from_Json(file_name="ExchangeCurrencyRate.json"): # get data from save file
+def Get_data_from_Json(file_name="SocketProject\ExchangeCurrencyRate.json"): # get data from save file
     
     #check if file exist or not
     if not os.path.isfile(file_name):
@@ -142,8 +142,8 @@ class Account():
   
     
     def __init__(self):
-        self.url_file="Account.json"
-        self.url_online_file="AccountLive.json"
+        self.url_file="SocketProject\Account.json"
+        self.url_online_file="SocketProject\AccountLive.json"
         self.user=None
         self.pwd=None
 
