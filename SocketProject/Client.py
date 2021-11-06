@@ -121,6 +121,8 @@ def Client_communicate(client_sock,server_addr): #Client communicate with server
 
                 if confirm == "true":
                     #have data
+                    if 'ALL' in List_Request:
+                        List_Request=[]
                     if msg not in List_Request:
                         List_Request.append(msg)
                     Specific_Currency(client_sock)
@@ -128,6 +130,7 @@ def Client_communicate(client_sock,server_addr): #Client communicate with server
                     #not have data
                     print("N/A")
             else:
+                List_Request =['ALL']
                 #get number of currency 
                 number = client_sock.recv(buffer)
                 number = number.decode('utf-8')
