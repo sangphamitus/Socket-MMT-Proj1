@@ -121,7 +121,8 @@ def Client_communicate(client_sock,server_addr): #Client communicate with server
 
                 if confirm == "true":
                     #have data
-                    List_Request.append(msg)
+                    if msg not in List_Request:
+                        List_Request.append(msg)
                     Specific_Currency(client_sock)
                 else:
                     #not have data
