@@ -70,7 +70,7 @@ def Get_data_API(keys): # use keys to get api's data
     
     return full_data
 
-def Save_data_to_Json(full_data,file_name="SocketProject\ExchangeCurrencyRate.json"): # save data to Json file
+def Save_data_to_Json(full_data,file_name="ExchangeCurrencyRate.json"): # save data to Json file
 
     # get time and date
     update_time, update_date=Get_time_and_day()
@@ -81,7 +81,7 @@ def Save_data_to_Json(full_data,file_name="SocketProject\ExchangeCurrencyRate.js
         out_file.write(json.dumps(full_data,indent=2))
         out_file.close()
 
-def Get_data_from_Json(file_name="SocketProject\ExchangeCurrencyRate.json"): # get data from save file
+def Get_data_from_Json(file_name="ExchangeCurrencyRate.json"): # get data from save file
     
     #check if file exist or not
     if not os.path.isfile(file_name):
@@ -142,8 +142,8 @@ class Account():
   
     
     def __init__(self):
-        self.url_file="SocketProject\Account.json"
-        self.url_online_file="SocketProject\AccountLive.json"
+        self.url_file="Account.json"
+        self.url_online_file="AccountLive.json"
         self.user=None
         self.pwd=None
 
@@ -459,16 +459,25 @@ class TCPSERVERMULTICLIENT(TCPSERVER):
                 # client_thread.start()
                 
         except KeyboardInterrupt:
-
+           
             self.shutdown_server()
         finally:
-
+            FirstRunningServer()
             self.shutdown_server()
 
 # ----- main -----
 
+def FirstRunningServer():
+
+    with open("AccountLive.json",'w') as out_file:
+        out_file.write(json.dumps({"username":[],"pwd":[],"socket":[]},indent=3))
+        out_file.close()
+
+
+
 def main():
     os.system("Title "+"Server")
+    #FirstRunningServer()
     tcp_server_multi_client=TCPSERVERMULTICLIENT(ServerIP,ServePort)
     tcp_server_multi_client.Config_server()
     tcp_server_multi_client.wait_for_client()

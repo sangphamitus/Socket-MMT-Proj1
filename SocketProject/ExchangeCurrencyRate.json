@@ -1,136 +1,136 @@
 {
   "results": [
     {
-      "buy_cash": 16318.56,
-      "buy_transfer": 16483.39,
+      "buy_cash": 16170.85,
+      "buy_transfer": 16334.19,
       "currency": "AUD",
-      "sell": 17000.42
+      "sell": 16846.54
     },
     {
-      "buy_cash": 17741.11,
-      "buy_transfer": 17920.31,
+      "buy_cash": 17698.11,
+      "buy_transfer": 17876.88,
       "currency": "CAD",
-      "sell": 18482.41
+      "sell": 18437.62
     },
     {
-      "buy_cash": 24192.07,
-      "buy_transfer": 24436.43,
+      "buy_cash": 24062.8,
+      "buy_transfer": 24305.86,
       "currency": "CHF",
-      "sell": 25202.91
+      "sell": 25068.26
     },
     {
-      "buy_cash": 3469.7,
-      "buy_transfer": 3504.75,
+      "buy_cash": 3474.62,
+      "buy_transfer": 3509.72,
       "currency": "CNY",
-      "sell": 3615.22
+      "sell": 3620.35
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 3459.53,
+      "buy_transfer": 3435.72,
       "currency": "DKK",
-      "sell": 3589.53
+      "sell": 3564.82
     },
     {
-      "buy_cash": 25537.39,
-      "buy_transfer": 25795.34,
+      "buy_cash": 25361.49,
+      "buy_transfer": 25617.67,
       "currency": "EUR",
-      "sell": 26945.19
+      "sell": 26759.61
     },
     {
-      "buy_cash": 29793.25,
-      "buy_transfer": 30094.19,
+      "buy_cash": 29616.74,
+      "buy_transfer": 29915.9,
       "currency": "GBP",
-      "sell": 31038.14
+      "sell": 30854.27
     },
     {
-      "buy_cash": 2839.65,
-      "buy_transfer": 2868.34,
+      "buy_cash": 2834.57,
+      "buy_transfer": 2863.2,
       "currency": "HKD",
-      "sell": 2958.31
+      "sell": 2953.01
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 304.13,
+      "buy_transfer": 303.81,
       "currency": "INR",
-      "sell": 316.06
+      "sell": 315.74
     },
     {
-      "buy_cash": 193.25,
-      "buy_transfer": 195.2,
+      "buy_cash": 192.92,
+      "buy_transfer": 194.87,
       "currency": "JPY",
-      "sell": 204.39
+      "sell": 204.04
     },
     {
-      "buy_cash": 16.56,
-      "buy_transfer": 18.4,
+      "buy_cash": 16.54,
+      "buy_transfer": 18.38,
       "currency": "KRW",
-      "sell": 20.16
+      "sell": 20.14
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 75057.32,
+      "buy_transfer": 74982.75,
       "currency": "KWD",
-      "sell": 78003.95
+      "sell": 77926.5
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 5395.78,
+      "buy_transfer": 5392.21,
       "currency": "MYR",
-      "sell": 5509.64
+      "sell": 5506.0
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 2593.11,
+      "buy_transfer": 2569.62,
       "currency": "NOK",
-      "sell": 2701.33
+      "sell": 2676.86
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 315.23,
+      "buy_transfer": 317.66,
       "currency": "RUB",
-      "sell": 351.26
+      "sell": 353.97
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 6029.32,
+      "buy_transfer": 6025.81,
       "currency": "SAR",
-      "sell": 6266.02
+      "sell": 6262.38
     },
     {
       "buy_cash": 0.0,
-      "buy_transfer": 2586.89,
+      "buy_transfer": 2552.48,
       "currency": "SEK",
-      "sell": 2694.85
+      "sell": 2659.01
     },
     {
-      "buy_cash": 16336.66,
-      "buy_transfer": 16501.68,
+      "buy_cash": 16330.68,
+      "buy_transfer": 16495.63,
       "currency": "SGD",
-      "sell": 17019.28
+      "sell": 17013.05
     },
     {
-      "buy_cash": 601.6,
-      "buy_transfer": 668.45,
+      "buy_cash": 609.07,
+      "buy_transfer": 676.74,
       "currency": "THB",
-      "sell": 693.57
+      "sell": 702.17
     },
     {
-      "buy_cash": 22540.0,
-      "buy_transfer": 22570.0,
+      "buy_cash": 22525.0,
+      "buy_transfer": 22555.0,
       "currency": "USD",
-      "sell": 22770.0
+      "sell": 22755.0
     }
   ],
   "update_time": [
     {
-      "day": 6,
+      "day": 11,
       "month": 11,
       "year": 2021
     },
     {
-      "hour": 18,
-      "minute": 0,
-      "sec": 28
+      "hour": 10,
+      "minute": 2,
+      "sec": 13
     }
   ]
 }

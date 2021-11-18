@@ -46,7 +46,7 @@ def Specific_Currency(client_sock):  # recev one dict and print
         Print_object(data_recv)
     
     except OSError:
-        
+        print("Server disconnected...")
         client_sock.close()
     
 def Update_data(update_time): #Check and update data 
@@ -101,53 +101,57 @@ def Client_communicate(client_sock,server_addr): #Client communicate with server
         # get input command
             msg= input('Input: ')
         msg=msg.upper()
-        client_sock.sendto(str.encode(msg),server_addr)
-        #command Quit
-        if msg =='QUIT':
-            #quit loop
-            break
 
-        else:
-            #get update time
-            update_time=client_sock.recv(buffer).decode('utf-8')
+        try:
+            client_sock.sendto(str.encode(msg),server_addr)
+            #command Quit
+            if msg =='QUIT':
+                #quit loop
+                break
 
-            print(f'{update_time}')
-
-            if msg!='ALL':
-                if msg == 'CLEAR':
-                    List_Request=[]
-                #get confirm that server haves data or not
-                confirm =client_sock.recv(buffer).decode('utf-8')
-
-                if confirm == "true":
-                    #have data
-                    if 'ALL' in List_Request:
-                        List_Request=[]
-                    if msg not in List_Request:
-                        List_Request.append(msg)
-                    Specific_Currency(client_sock)
-                else:
-                    #not have data
-                    print("N/A")
             else:
-                List_Request =['ALL']
-                #get number of currency 
-                number = client_sock.recv(buffer)
-                number = number.decode('utf-8')
-                number =int(number)
-                
+                #get update time
+                update_time=client_sock.recv(buffer).decode('utf-8')
 
-                #receive all data of currency
-                no=0
-                while no<number:
-                    data= client_sock.recv(buffer).decode('utf-8')
-                    data=str(data).split(',')
-                    while data[0]!='':
-                        Print_object(data)
-                        data=data[4:]
+                print(f'{update_time}')
+
+                if msg!='ALL':
+                    if msg == 'CLEAR':
+                        List_Request=[]
+                    #get confirm that server haves data or not
+                    confirm =client_sock.recv(buffer).decode('utf-8')
+
+                    if confirm == "true":
+                        #have data
+                        if 'ALL' in List_Request:
+                            List_Request=[]
+                        if msg not in List_Request:
+                            List_Request.append(msg)
+                        Specific_Currency(client_sock)
+                    else:
+                        #not have data
+                        print("N/A")
+                else:
+                    List_Request =['ALL']
+                    #get number of currency 
+                    number = client_sock.recv(buffer)
+                    number = number.decode('utf-8')
+                    number =int(number)
+                    
+
+                    #receive all data of currency
+                    no=0
+                    while no<number:
+                        data= client_sock.recv(buffer).decode('utf-8')
+                        data=str(data).split(',')
+                        while data[0]!='':
+                            Print_object(data)
+                            data=data[4:]
+                            no=no+1
                         no=no+1
-                    no=no+1
-
+        except:
+            print("Server disconnected..")
+            break
     client_sock.close()
 
 def Client_login(client_sock,server_addr):
