@@ -17,9 +17,11 @@ def Create_Connection(): #Create connection
     
     #create socket
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-
-    sock.connect((server_IP,client_Port))
-
+    try:
+        sock.connect((server_IP,client_Port))
+    except:
+        return None,(None,None)
+        
     return sock,(server_IP,client_Port)
 
 def Print_object(object): # print and dict
@@ -78,7 +80,8 @@ def Update_data(update_time): #Check and update data
 
 def Client_communicate(client_sock,server_addr): #Client communicate with server
 
-    Client_login(client_sock,server_addr)
+    if Client_login(client_sock,server_addr)== False:
+        return False
     List_Request=[]
     update_time=0
     last_update_time=0
@@ -153,8 +156,10 @@ def Client_communicate(client_sock,server_addr): #Client communicate with server
             print("Server disconnected..")
             break
     client_sock.close()
+    return True
 
 def Client_login(client_sock,server_addr):
+
     while True:
         
         #input username, pwd and status
@@ -163,7 +168,21 @@ def Client_login(client_sock,server_addr):
         status_login= input('Login Status: ')
         msg=status_login+','+username+','+pwd
         #send info to server
-        client_sock.sendto(msg.encode('utf-8'),server_addr)
+        try:
+            client_sock.sendto(msg.encode('utf-8'),server_addr)
+            resp = client_sock.recv(buffer).decode('utf-8')
+
+            print(resp)
+
+            if resp == 'Login success' :
+                os.system("Title "+username)
+                return True
+                
+        except:
+            print("Server disconnected..")
+            client_sock.close()
+            return False
+            
         # client_sock.sendto(status_login.encode('utf-8'),server_addr)
         
         # client_sock.sendto(username.encode('utf-8'),server_addr)
@@ -171,19 +190,16 @@ def Client_login(client_sock,server_addr):
         # client_sock.sendto(pwd.encode('utf-8'),server_addr)
       
         # recv resp from server
-        resp = client_sock.recv(buffer).decode('utf-8')
-
-        print(resp)
-
-        if resp == 'Login success' :
-            os.system("Title "+username)
-            break
+        
 
 
 def main():
     os.system("Title "+"Client")
     sock,server_addr=Create_Connection()
-    Client_communicate(sock,server_addr)
+    if sock== None:
+        print("can't connect to server")
+    else:
+        Client_communicate(sock,server_addr)
 
 if __name__=='__main__':
     main()
