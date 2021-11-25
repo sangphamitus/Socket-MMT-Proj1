@@ -268,45 +268,48 @@ class Account():
         while True :
             #get status login
             msg =client_sock.recv(buffer).decode('utf-8')
-            msg = str(msg).split(',')
-            # Status_login = client_sock.recv(buffer).decode('utf-8')
-            # print(Status_login)
-            
-            # # recv login information
-            # self.user=client_sock.recv(buffer).decode('utf-8')
-            # self.pwd=client_sock.recv(buffer).decode('utf-8')
-            Status_login = msg[0]
-            self.user=msg[1]
-            self.pwd=msg[2]
-            All_account=self.Read_json_file(self.url_file)
+            if(len(msg)!=0):
+                msg = str(msg).split(',')
+                print(msg)
+                # Status_login = client_sock.recv(buffer).decode('utf-8')
+                # print(Status_login)
+                
+                # # recv login information
+                # self.user=client_sock.recv(buffer).decode('utf-8')
+                # self.pwd=client_sock.recv(buffer).decode('utf-8')
+                
+                Status_login = msg[0]
+                self.user=msg[1]
+                self.pwd=msg[2]
+                All_account=self.Read_json_file(self.url_file)
 
-            if Status_login == 'Res':
+                if Status_login == 'Res':
 
-                if self.Register(All_account) == True:
+                    if self.Register(All_account) == True:
 
-                    self.LogIn_Success(client_sock,client_IP)
-                    client_sock.sendall('Login success'.encode('utf-8'))
-                    break
-                else:
-                    client_sock.sendall('Username already have'.encode('utf-8'))
-
-            else:   
-
-                if Status_login == 'Log':
-
-                    Account_status= self.LogIn(All_account)
-
-                    if Account_status == 1:
                         self.LogIn_Success(client_sock,client_IP)
                         client_sock.sendall('Login success'.encode('utf-8'))
                         break
+                    else:
+                        client_sock.sendall('Username already have'.encode('utf-8'))
 
-                    if Account_status == 0:
-                        client_sock.sendall('Wrong password or username'.encode('utf-8'))
+                else:   
 
-                    if Account_status == 2:
-                        client_sock.sendall('Account current online'.encode('utf-8'))
-                
+                    if Status_login == 'Log':
+
+                        Account_status= self.LogIn(All_account)
+
+                        if Account_status == 1:
+                            self.LogIn_Success(client_sock,client_IP)
+                            client_sock.sendall('Login success'.encode('utf-8'))
+                            break
+
+                        if Account_status == 0:
+                            client_sock.sendall('Wrong password or username'.encode('utf-8'))
+
+                        if Account_status == 2:
+                            client_sock.sendall('Account current online'.encode('utf-8'))
+                    
 # ------ TCP server -------
 class TCPSERVER(Account):
 
