@@ -1,10 +1,11 @@
 import tkinter
 from tkinter import *
+from PIL import Image, ImageTk
 from tkinter import ttk
 from tkinter.constants import ANCHOR
 from tkinter.messagebox import showinfo
 from tkinter import messagebox
-from tkinter import Canvas, Frame, BOTH
+from tkinter import Tk, Canvas, Frame, BOTH
 
 def ClientGUI(IPServer):
 
@@ -13,7 +14,7 @@ def ClientGUI(IPServer):
     #clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("900x550")
     clientwindow.title("Currency Exchange")
-    bg = PhotoImage(file = "Currency exchange.png")
+    bg = PhotoImage(file = "currency exchange.png")
 
     label1 = Label( clientwindow, image = bg)
     label1.place(x = 0, y = 0)
