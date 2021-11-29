@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import *
+from tkinter.font import Font, families
 from PIL import Image, ImageTk
 from tkinter import ttk
 from tkinter.constants import ANCHOR
@@ -14,13 +15,13 @@ def ClientGUI(IPServer):
     #clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("900x550")
     clientwindow.title("Currency Exchange")
-    bg = PhotoImage(file = "currency exchange.png")
+    canvas= Canvas( clientwindow,width=900 , height=550)
+    img = ImageTk.PhotoImage(Image.open("Currency exchange.png"))
+    canvas.create_image(450,275,image=img)
+    canvas.place(x=0,y=0)
 
-    label1 = Label( clientwindow, image = bg)
-    label1.place(x = 0, y = 0)
-    
-    frame1 = Frame(clientwindow)
-    frame1.pack(pady = 20 )
+  
+
   
 
     def on_closing():
@@ -57,35 +58,35 @@ def ClientGUI(IPServer):
     #tạo frame chọn option menu
     variable = tkinter.StringVar(clientwindow)
     variable.set(options[0])
-    left_frame = tkinter.Frame(clientwindow, width = 805, height = 130, bg = '#DDC488')
-    left_frame.place(x=20,y=0)
+    
     w = tkinter.OptionMenu(clientwindow,variable,*options)
     w.config(width=10,bg = "#5a5865", fg = '#dff0ee')
     
     # hiện chữ Currency Exchange
-    k=tkinter.Label(clientwindow,text= "Currency Exchange", fg = 'blue')
-    k.config(font=("Courier", 20))
-    k.place(x=300,y=10)
+    #k=tkinter.Label(clientwindow,text= "Currency Exchange", fg = 'blue')
+  #  k.config(font=("Courier", 20))
+   # k.place(x=300,y=10)
     k2=tkinter.Label(clientwindow,text= "Currency")
-    k2.config(font=("Courier", 15))
-    k2.place(x=300,y=52)
-    w.place(x=420,y=50)
+    k2.config(font=("Courier", 15,"bold"),background='#121F50',fg="white")
+    k2.place(x=340,y=65)
+    w.place(x=450,y=65)
 
     # tạo các nút 
     tkinter.Button(clientwindow,text="LOG OUT",command=LogOutPopUp,bg = "white", fg = 'red').place(x=50,y=20)
     #tkinter.Button(clientwindow,text="INPUT",command=lambda:print(f"{variable.get()}")).place(x=530,y=52 )
-    tkinter.Button(clientwindow,text="INPUT",command=lambda:InputMsg(),width=18).place(x=300,y=90 )
-    tkinter.Button(clientwindow,text="CLEAR LIST",command=lambda:ClearList(),width=18).place(x=440,y=90 )
+    tkinter.Button(clientwindow,text="INPUT",command=lambda:InputMsg(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=300,y=105 )
+    tkinter.Button(clientwindow,text="CLEAR LIST",command=lambda:ClearList(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=450,y=105)
    # white_frame = tkinter.Frame(clientwindow, width = 900, height = 500, bg = 'white')
    # white_frame.place(x=0,y=100)
 
     # tạo các trêe view để xem các kết quả trả về
     columns =('currency','buy_cash','buy_transfer','sell')
     tree= ttk.Treeview(clientwindow,columns=columns,show='headings')
+    
     style = ttk.Style()
     style.theme_use("default")
-    style.configure("Treeview", background = "white", foreground = "black", rowheight = 25, fieldbackground = "white")
-    style.map("Treeview", background = [('selected', 'blue')])
+    style.configure("Treeview", background = "#006cbe", rowheight = 25, fieldbackground = "#121F50",font=("Alatsi",13,""))
+    style.map("Treeview", background = [('selected', "#006cbe")])
     
     tree.column('#0', width = 0, stretch =tkinter.NO)
     tree.column('currency',anchor='c')
@@ -100,8 +101,8 @@ def ClientGUI(IPServer):
     tree.heading('sell',text='Sell',anchor='c')
 
     # tạo màu cho mấy dòng lẻ và chẵn
-    tree.tag_configure('odd', background = '#CCCCFF')
-    tree.tag_configure('even', background = 'white')
+    tree.tag_configure('odd', background = '#006cbe',foreground = "#ffffff" )
+    tree.tag_configure('even', background = '#121F50',foreground = "#ffffff")
 
 
     recev=[]
@@ -148,7 +149,7 @@ def ClientGUI(IPServer):
     #tree.bind('<<TreeviewSelect>>', item_selected)
 
     # chỗ hiện tree view
-    tree.place(x=20,y=130,height=400)
+    tree.place(x=50,y=140,height=400)
 
     clientwindow.mainloop()
 
@@ -158,7 +159,10 @@ def loginGUI(IPServer):
     loginwindow=tkinter.Tk()
     loginwindow.geometry("500x160")
     loginwindow.title("Login Input")
-
+    canvas= Canvas( loginwindow,width=500, height=160)
+    img = ImageTk.PhotoImage(Image.open("Login.jpg"))
+    canvas.create_image(250,80,image=img)
+    canvas.place(x=0,y=0)
     # label nếu login thâts bại 
     loginFail=tkinter.Label(loginwindow,fg="red",text="Please input Username and Password")
 
@@ -190,22 +194,25 @@ def loginGUI(IPServer):
         return False
     
     # hiện pasword và username 
-    tkinter.Label(text="Username").grid(row=0,column=0,ipadx=10)
-    tkinter.Label(text="Password").grid(row=1,column=0)
+    #tkinter.Label(text="Username").grid(row=0,column=0,ipadx=10)
+    #tkinter.Label(text="Password").grid(row=1,column=0)
 
     # tạo nơi nhập user và pass
-    UserInput=tkinter.Entry(loginwindow,width=50)
-    UserInput.grid(row=0,column=1,padx=(10,100),pady=(10,5))
-    PassInput=tkinter.Entry(loginwindow,width=50)
+    UserInput=tkinter.Entry(loginwindow,width=40)
+    UserInput.config(bg="#121F50",insertbackground='white',font=("",12,""),fg="white")
+    UserInput.place(x=120,y=13)
+    PassInput=tkinter.Entry(loginwindow,width=40)
+    PassInput.config(bg="#121F50",insertbackground='white',font=("",12,""),fg="white")
     PassInput.config(show="*")
-    PassInput.grid(row=1,column=1,padx=(10,100))
+    PassInput.place(x=120,y=45)
 
     # hiện label 
-    tkinter.Label(text=f"IP Server: {IPServer}").grid(row=2,column=1,padx=(0,100))
-   
+    lanle=tkinter.Label(text=f"{IPServer}")
+    lanle.config(bg="#121F50",fg="white",font=("",8,"bold"))
+    lanle.place(x=205,y=81)
     # hiện nút login và đăng kí
-    tkinter.Button(text="Login",command=lambda : getLoginInfo(UserInput,PassInput,"Log"), bg = "#5a5865", fg = '#dff0ee',width=14,padx=30).place(x=80,y=120)
-    tkinter.Button(text="Register",command= lambda: getLoginInfo(UserInput,PassInput,"Reg"), bg = "#5a5865", fg = '#dff0ee',width=14,padx=30).place(x=240,y=120)
+    tkinter.Button(text="Login",command=lambda : getLoginInfo(UserInput,PassInput,"Log"),bg = "#006cbe", fg = 'white',width=14,padx=33).place(x=90,y=120)
+    tkinter.Button(text="Register",command= lambda: getLoginInfo(UserInput,PassInput,"Reg"), bg = "#006cbe", fg = 'white',width=14,padx=33).place(x=260,y=120)
     loginwindow.mainloop()
 
 def inputServerIP():
@@ -239,14 +246,19 @@ def inputServerIP():
             loginGUI(IPServer)
 
     #tạo label Input IP có màu bg tại vị trí (0,0) padding y padding x 
-    tkinter.Label(window,text="Input IP: ",bg = "#e1dcfd").grid(row=0,column=0,pady=(20,20),padx=(20,20))
+    canvas= Canvas(window,width=450, height=100)
+    img = ImageTk.PhotoImage(Image.open("inputIP.jpg"))
+    canvas.create_image(225,50,image=img)
+    canvas.place(x=0,y=0)
+    #tkinter.Label(window,text="Input IP: ",bg = "#e1dcfd").grid(row=0,column=0,pady=(20,20),padx=(20,20))
 
     # tạo khung để ghi
-    ipInp =tkinter.Entry(window,width=50)
-    ipInp.grid(row=0,column=1)
+    ipInp =tkinter.Entry(window,width=35,fg='white' ,font=("",12))
+    ipInp.config(bg="#121F50",insertbackground='white')
+    ipInp.place(x=105,y=21)
 
     # tạo nút
-    tkinter.Button(window,text="Input ", command=show_entry_fields,padx=20, bg = "#5a5865", fg = '#dff0ee',width=14).grid(row=2,column=1,padx=(10,30))
+    tkinter.Button(window,text="Input ", command=show_entry_fields, bg = "#006cbe", fg = 'white',width=12).place(x=200,y=60)
     window.mainloop()
 
 def main():
