@@ -3,12 +3,13 @@ from tkinter import ttk
 from tkinter.constants import ANCHOR
 from tkinter.messagebox import showinfo
 from tkinter import messagebox
+from tkinter import Canvas, Frame, BOTH
 
 def ClientGUI(IPServer):
 
     # tạo console
     clientwindow=tkinter.Tk()
-    clientwindow.configure(bg = "#e1dcfd")
+    clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("900x550")
     clientwindow.title("Currency Exchange")
 
