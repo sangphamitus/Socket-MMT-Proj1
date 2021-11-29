@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import *
 from tkinter import ttk
 from tkinter.constants import ANCHOR
 from tkinter.messagebox import showinfo
@@ -9,9 +10,17 @@ def ClientGUI(IPServer):
 
     # tạo console
     clientwindow=tkinter.Tk()
-    clientwindow.configure(bg = "#FFF5E7")
+    #clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("900x550")
     clientwindow.title("Currency Exchange")
+    bg = PhotoImage(file = "Currency exchange.png")
+
+    label1 = Label( clientwindow, image = bg)
+    label1.place(x = 0, y = 0)
+    
+    frame1 = Frame(clientwindow)
+    frame1.pack(pady = 20 )
+  
 
     def on_closing():
         #khi bấm nút thoát 
