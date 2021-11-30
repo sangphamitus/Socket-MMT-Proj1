@@ -19,11 +19,6 @@ def ClientGUI(IPServer):
     img = ImageTk.PhotoImage(Image.open("Currency exchange.png"))
     canvas.create_image(450,275,image=img)
     canvas.place(x=0,y=0)
-
-  
-
-  
-
     def on_closing():
         #khi bấm nút thoát 
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
@@ -84,9 +79,9 @@ def ClientGUI(IPServer):
     tree= ttk.Treeview(clientwindow,columns=columns,show='headings')
     
     style = ttk.Style()
-    style.theme_use("default")
-    style.configure("Treeview", background = "#006cbe", rowheight = 25, fieldbackground = "#121F50",font=("Alatsi",13,""))
-    style.map("Treeview", background = [('selected', "#006cbe")])
+    style.theme_use("clam")
+    style.configure("Treeview", background = "#006cbe", rowheight = 25, fieldbackground = "#121F50",font=("Alatsi",13,""),foreground='white')
+    style.map("Treeview", background = [('selected', "#006cbe")],foreground=[('selected',"#ffffff")])
     
     tree.column('#0', width = 0, stretch =tkinter.NO)
     tree.column('currency',anchor='c')
@@ -101,8 +96,9 @@ def ClientGUI(IPServer):
     tree.heading('sell',text='Sell',anchor='c')
 
     # tạo màu cho mấy dòng lẻ và chẵn
-    tree.tag_configure('odd', background = '#006cbe',foreground = "#ffffff" )
-    tree.tag_configure('even', background = '#121F50',foreground = "#ffffff")
+    tree.tag_configure('odd', background = '#006cbe')
+    tree.tag_configure('even', background = '#121F50')
+    tree.tag_configure('word',foreground='white')
 
 
     recev=[]
@@ -131,9 +127,9 @@ def ClientGUI(IPServer):
         idx=0
         for cont in recev:
             if idx %2 == 0:
-                tree.insert('',index='end',value=cont,tags=('even',))
+                tree.insert('',index='end',value=cont,tags=('even','word'))
             else:                
-                tree.insert('',index='end',value=cont,tags=('odd',))
+                tree.insert('',index='end',value=cont,tags=('odd','word'))
             idx=idx+1
     
     def item_selected(event):
