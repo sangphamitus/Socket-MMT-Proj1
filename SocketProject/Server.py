@@ -1,6 +1,7 @@
 import json
 import os
 import socket
+from tkinter.constants import FALSE
 import requests
 from urllib.request import urlopen
 from requests.api import head, request
@@ -85,7 +86,7 @@ def Get_data_from_Json(file_name="ExchangeCurrencyRate.json"): # get data from s
     
     #check if file exist or not
     if not os.path.isfile(file_name):
-        Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key()))
+        Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key()),file_name=file_name)
 
     # get data from file
     with open(file_name,'r') as file_in:
@@ -100,7 +101,11 @@ def Update_data(full_data): #Check and update data
     response=full_data
     last_update_time = full_data.get('update_time')
     current_time,current_day=Get_time_and_day()
-    
+
+
+    filename=f"{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
+
+
     #check if 30 minutes last or not
     if last_update_time[0].get('day')==current_day.get('day') and last_update_time[0].get('month')==current_day.get('month') and last_update_time[0].get('year')==current_day.get('year'):
         
@@ -108,19 +113,47 @@ def Update_data(full_data): #Check and update data
             
             if abs(int(last_update_time[1].get('minute')) - int(current_time.get('minute')))>=30:
                 
-                Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key())) 
-                response=Get_data_from_Json()
+                Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key()),file_name=filename) 
+                response=Get_data_from_Json(file_name=filename)
         else:
 
-            Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key())) 
-            response=Get_data_from_Json()
+            Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key()),file_name=filename) 
+            response=Get_data_from_Json(file_name=filename)
     else:
 
-        Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key())) 
-        response=Get_data_from_Json()  
+        Save_data_to_Json(full_data=Get_data_API(keys=Get_API_key()),file_name=filename) 
+        response=Get_data_from_Json(file_name=filename)
     
     return response
+
+def Read_File(day):
+    filename=f"{day[0]}_{day[1]}_{day[2]}.json"
+      #check if file exist or not
+    if not os.path.isfile(filename):
+        return None
+
+    # get data from file
+    try:
+        with open(filename,'r') as file_in:
+            response = json.load(file_in)
+            file_in.close()
+        return response
+    except:
+        return None
+
+def Find_currency_file(full_data,currency_name=None):
+    print(f"data_at_time: {full_data.get('update_time')}")
+    update_time = f"{full_data.get('update_time')[0].get('day')}/{full_data.get('update_time')[0].get('month')}/{full_data.get('update_time')[0].get('year')} {full_data.get('update_time')[1].get('hour')}:{full_data.get('update_time')[1].get('minute')}:{full_data.get('update_time')[1].get('sec')}"
     
+    #searching for currency name
+    for object in full_data.get('results'):
+        if(currency_name != None):
+            if(object.get('currency')==currency_name):
+                return object,update_time
+
+    return None,update_time
+
+
 def Find_currency(full_data,currency_name=None): #find currency in data
 
     full_data=Update_data(full_data)
@@ -269,6 +302,8 @@ class Account():
             #get status login
             msg =client_sock.recv(buffer).decode('utf-8')
             if(len(msg)!=0):
+                if(msg=="QUIT"):
+                    return False
                 msg = str(msg).split(',')
                 print(msg)
                 # Status_login = client_sock.recv(buffer).decode('utf-8')
@@ -289,7 +324,7 @@ class Account():
 
                         self.LogIn_Success(client_sock,client_IP)
                         client_sock.sendall('Login success'.encode('utf-8'))
-                        break
+                        return True
                     else:
                         client_sock.sendall('Username already have'.encode('utf-8'))
 
@@ -302,7 +337,7 @@ class Account():
                         if Account_status == 1:
                             self.LogIn_Success(client_sock,client_IP)
                             client_sock.sendall('Login success'.encode('utf-8'))
-                            break
+                            return True
 
                         if Account_status == 0:
                             client_sock.sendall('Wrong password or username'.encode('utf-8'))
@@ -368,66 +403,90 @@ class TCPSERVER(Account):
     def Handle_client(self,client_sock,client_IP): #handle Client
           # get data from json file
         
-        self.Client_Login(client_sock,client_IP)
+        if(self.Client_Login(client_sock,client_IP)==True):
 
-        full_data=Get_data_from_Json()
-        try:
-            # receive request from client
-            data_enc =client_sock.recv(buffer)
-            while data_enc:
-                
-                #get cmd from Client
-                client_msg = data_enc.decode('utf-8')
-                if client_msg =='QUIT':
-                    break
-                else:
-
-                    if client_msg!='ALL':
-
-                        #find currency 
-                        object,update_time =Find_currency(full_data,client_msg)
-
-                        #send time update
-                        client_sock.sendall(update_time.encode('utf-8'))
-
-                        #send if server have that data or not 
-                        if object != None:
-                            client_sock.sendall(str('true').encode('utf-8'))
-                            self.Send_currency_data(client_sock=client_sock,object=object)
-                        else:
-                            client_sock.sendall(str('false').encode('utf-8'))
-
-                    else:
-                        
-                        # find currency 
-                        object,update_time =Find_currency(full_data)
-
-                        # send time update
-                        client_sock.sendall(update_time.encode('utf-8'))
-
-                        #get number of currency and send to client
-                        number= len(full_data.get('results'))
-                        client_sock.sendall(str(number).encode('utf-8'))
-                        print(number)
-
-                        #send all data to client
-                        for no in full_data.get('results'):
-                            self.Send_currency_data(client_sock=client_sock,object=no)
-
-                #receive data from client
-                data_enc =client_sock.recv(buffer)
-
-        except OSError as err:
-            self.Print_to_Screen(err)
-        
-        finally:
             
+            current_time,current_day=Get_time_and_day()
+
+
+            filename=f"{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
+            full_data=Get_data_from_Json(filename)
+            try:
+                # receive request from client
+                data_enc =client_sock.recv(buffer)
+                while data_enc:
+                    
+                    #get cmd from Client
+                    client_msg = data_enc.decode('utf-8')
+                    if client_msg =='QUIT':
+                        break
+                    else:
+
+                        if client_msg!='ALL':
+                            
+                            
+                            all_msg=client_msg.split(',')
+                            client_msg=all_msg[0]
+                            day=all_msg[1].split('/')
+                            currntday=datetime.today()
+                            if(int(day[0])==int(currntday.day) and int(day[1])==int(currntday.month) and int(day[2])==int(currntday.year)):
+                            
+
+                            #find currency 
+                                object,update_time =Find_currency(full_data,client_msg)
+                            else:
+                                full_data_file=Read_File(day)
+                                if(full_data_file!=None):
+                                    object,update_time=Find_currency_file(full_data_file,client_msg)
+                                else:
+                                    update_time ="None"
+                                    object=None
+                            #send time update
+                            client_sock.sendall(update_time.encode('utf-8'))
+
+                            #send if server have that data or not 
+                            if object != None:
+                                client_sock.sendall(str('true').encode('utf-8'))
+                                self.Send_currency_data(client_sock=client_sock,object=object)
+                            else:
+                                client_sock.sendall(str('false').encode('utf-8'))
+
+                        else:
+                            
+                            # find currency 
+                            object,update_time =Find_currency(full_data)
+
+                            # send time update
+                            client_sock.sendall(update_time.encode('utf-8'))
+
+                            #get number of currency and send to client
+                            number= len(full_data.get('results'))
+                            client_sock.sendall(str(number).encode('utf-8'))
+                            print(number)
+
+                            #send all data to client
+                            for no in full_data.get('results'):
+                                self.Send_currency_data(client_sock=client_sock,object=no)
+
+                    #receive data from client
+                    data_enc =client_sock.recv(buffer)
+
+            except OSError as err:
+                self.Print_to_Screen(err)
+            
+            finally:
+                
+                #close connection
+                self.Print_to_Screen(f'Closing client socket for {client_IP}')
+                self.LogOut(client_sock,client_IP)
+                client_sock.close()
+                self.Print_to_Screen(f'Closed {client_IP}')
+        else:
             #close connection
             self.Print_to_Screen(f'Closing client socket for {client_IP}')
-            self.LogOut(client_sock,client_IP)
-            client_sock.close()
-            self.Print_to_Screen(f'Closed {client_IP}')
             
+            client_sock.close()
+            self.Print_to_Screen(f'Closed {client_IP}')   
 
     def shutdown_server(self):
         

@@ -1,3 +1,4 @@
+from datetime import datetime
 import tkinter
 from tkinter import *
 from tkinter.font import Font, families
@@ -13,11 +14,11 @@ def ClientGUI(IPServer):
     # tạo console
     clientwindow=tkinter.Tk()
     #clientwindow.configure(bg = "#FFF5E7")
-    clientwindow.geometry("900x550")
+    clientwindow.geometry("1050x600")
     clientwindow.title("Currency Exchange")
-    canvas= Canvas( clientwindow,width=900 , height=550)
-    img = ImageTk.PhotoImage(Image.open("Currency exchange.png"))
-    canvas.create_image(450,275,image=img)
+    canvas= Canvas( clientwindow,width=1050 , height=600)
+    img = ImageTk.PhotoImage(Image.open("main.jpg"))
+    canvas.create_image(525,300,image=img)
     canvas.place(x=0,y=0)
     def on_closing():
         #khi bấm nút thoát 
@@ -55,27 +56,29 @@ def ClientGUI(IPServer):
     variable.set(options[0])
     
     w = tkinter.OptionMenu(clientwindow,variable,*options)
-    w.config(width=10,bg = "#5a5865", fg = '#dff0ee')
+    w.config(width=17,bg = "#5a5865", fg = '#dff0ee',font=("",13,"bold"))
     
     # hiện chữ Currency Exchange
     #k=tkinter.Label(clientwindow,text= "Currency Exchange", fg = 'blue')
   #  k.config(font=("Courier", 20))
    # k.place(x=300,y=10)
-    k2=tkinter.Label(clientwindow,text= "Currency")
-    k2.config(font=("Courier", 15,"bold"),background='#121F50',fg="white")
-    k2.place(x=340,y=65)
-    w.place(x=450,y=65)
 
+    w.place(x=240,y=100)
+
+  
+    InputDay=tkinter.Entry(clientwindow)
+    InputDay.config(width=12,font=("",20,""))
+    InputDay.place(x=773,y=100)
     # tạo các nút 
     tkinter.Button(clientwindow,text="LOG OUT",command=LogOutPopUp,bg = "white", fg = 'black',borderwidth=0).place(x=50,y=20)
     #tkinter.Button(clientwindow,text="INPUT",command=lambda:print(f"{variable.get()}")).place(x=530,y=52 )
-    tkinter.Button(clientwindow,text="INPUT",command=lambda:InputMsg(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=300,y=105 )
-    tkinter.Button(clientwindow,text="CLEAR LIST",command=lambda:ClearList(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=450,y=105)
+    tkinter.Button(clientwindow,text="INPUT",command=lambda:InputMsg(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=375,y=150 )
+    tkinter.Button(clientwindow,text="CLEAR LIST",command=lambda:ClearList(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=525,y=150)
    # white_frame = tkinter.Frame(clientwindow, width = 900, height = 500, bg = 'white')
    # white_frame.place(x=0,y=100)
 
     # tạo các trêe view để xem các kết quả trả về
-    columns =('currency','buy_cash','buy_transfer','sell')
+    columns =('currency','buy_cash','buy_transfer','sell','day')
     tree= ttk.Treeview(clientwindow,columns=columns,show='headings')
     
     style = ttk.Style()
@@ -88,12 +91,15 @@ def ClientGUI(IPServer):
     tree.column('buy_cash',anchor='c')
     tree.column('buy_transfer',anchor='c')
     tree.column('sell',anchor='c')
+    tree.column('day',anchor='c')
     
     tree.heading("0", text = "", anchor = 'c')
     tree.heading('currency', text= 'Currency',anchor='c')
     tree.heading('buy_cash', text='Buy cash',anchor='c')
     tree.heading('buy_transfer',text='Buy transfer',anchor='c')
     tree.heading('sell',text='Sell',anchor='c')
+    tree.heading('day',text='Day',anchor='c')
+
 
     # tạo màu cho mấy dòng lẻ và chẵn
     tree.tag_configure('odd', background = '#006cbe')
@@ -114,7 +120,12 @@ def ClientGUI(IPServer):
 
     # thêm msg vào danh sách kết quả
     def InputMsg():
-        print(f'{variable.get()} ')
+        day=InputDay.get()
+        if (len(day)==0):
+            currntday =datetime.today()
+            day=f"{currntday.day}/{currntday.month}/{currntday.year}"
+        
+        print(f'{variable.get()},{day} ')
         for item in tree.get_children():
             tree.delete(item)
         if variable.get() not in contact:
@@ -145,7 +156,7 @@ def ClientGUI(IPServer):
     #tree.bind('<<TreeviewSelect>>', item_selected)
 
     # chỗ hiện tree view
-    tree.place(x=50,y=140,height=400)
+    tree.place(x=20,y=190,height=400)
 
     clientwindow.mainloop()
 
@@ -185,7 +196,9 @@ def loginGUI(IPServer):
         else:   
 
             #đăng nhập thât bại 
-            loginFail.grid(row=3,column=1,padx=(0,100))
+            loginFail.config(bg="#121F50",fg="white",font=("",8,"bold"))
+            loginFail.place(x=150,y=100 )
+
     if IPServer =="":
         return False
     
