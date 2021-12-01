@@ -67,7 +67,7 @@ def ClientGUI(IPServer):
     w.place(x=450,y=65)
 
     # tạo các nút 
-    tkinter.Button(clientwindow,text="LOG OUT",command=LogOutPopUp,bg = "white", fg = 'red').place(x=50,y=20)
+    tkinter.Button(clientwindow,text="LOG OUT",command=LogOutPopUp,bg = "white", fg = 'black',borderwidth=0).place(x=50,y=20)
     #tkinter.Button(clientwindow,text="INPUT",command=lambda:print(f"{variable.get()}")).place(x=530,y=52 )
     tkinter.Button(clientwindow,text="INPUT",command=lambda:InputMsg(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=300,y=105 )
     tkinter.Button(clientwindow,text="CLEAR LIST",command=lambda:ClearList(),width=18,bg = "#006cbe", fg = 'white',padx=10).place(x=450,y=105)
