@@ -11,7 +11,6 @@ from datetime import datetime
 import threading
 import multiprocessing
 
-from Client import Client_login
 # ------ Assign const value -----
 
 buffer = 2048 #buffer send and recv data
@@ -429,8 +428,12 @@ class TCPSERVER(Account):
                             client_msg=all_msg[0]
                             day=all_msg[1].split('/')
                             currntday=datetime.today()
+                            day[0]=int(day[0])
+                            day[1]=int(day[1])
+                            day[2]=int(day[2])
                             if(int(day[0])==int(currntday.day) and int(day[1])==int(currntday.month) and int(day[2])==int(currntday.year)):
                             
+
 
                             #find currency 
                                 object,update_time =Find_currency(full_data,client_msg)
