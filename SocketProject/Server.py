@@ -495,6 +495,7 @@ class TCPSERVER(Account):
         
         #shutdown server
         self.Print_to_Screen('Server shutting down...')
+        FirstRunningServer()
         self.sock.close()
 
 # ----- TCP multi client -----
@@ -526,6 +527,7 @@ class TCPSERVERMULTICLIENT(TCPSERVER):
         except KeyboardInterrupt:
            
             self.shutdown_server()
+            FirstRunningServer()
         finally:
             FirstRunningServer()
             self.shutdown_server()
