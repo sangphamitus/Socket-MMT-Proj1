@@ -102,7 +102,7 @@ def Update_data(full_data): #Check and update data
     current_time,current_day=Get_time_and_day()
 
 
-    filename=f"{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
+    filename=f"Data/{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
 
 
     #check if 30 minutes last or not
@@ -126,7 +126,7 @@ def Update_data(full_data): #Check and update data
     return response
 
 def Read_File(day):
-    filename=f"{day[0]}_{day[1]}_{day[2]}.json"
+    filename=f"Data/{day[0]}_{day[1]}_{day[2]}.json"
       #check if file exist or not
     if not os.path.isfile(filename):
         return None
@@ -408,7 +408,7 @@ class TCPSERVER(Account):
             current_time,current_day=Get_time_and_day()
 
 
-            filename=f"{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
+            filename=f"Data/{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
             full_data=Get_data_from_Json(filename)
             try:
                 # receive request from client

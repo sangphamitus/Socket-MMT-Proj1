@@ -25,6 +25,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
     clientwindow=tkinter.Tk()
     #clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("1050x600")
+    clientwindow.iconbitmap('logo.ico')
     clientwindow.title("Currency Exchange")
     canvas= Canvas( clientwindow,width=1050 , height=600)
     img = ImageTk.PhotoImage(Image.open("main.jpg"))
@@ -203,6 +204,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
 def loginGUI(IPServer,client_sock,server_addr):
     loginwindow=tkinter.Tk()
     loginwindow.geometry("500x160")
+    loginwindow.iconbitmap('logo.ico')
     loginwindow.title("Login Input")
     canvas= Canvas( loginwindow,width=500, height=160)
     img = ImageTk.PhotoImage(Image.open("Login.jpg"))
@@ -300,7 +302,7 @@ def inputServerIP():
 
     # cấu hình nền bg cho console
     window.configure(bg = "#e1dcfd")
-
+    window.iconbitmap('logo.ico')
     # title của console
     window.title("Input IP Server")
     IPServer=""
