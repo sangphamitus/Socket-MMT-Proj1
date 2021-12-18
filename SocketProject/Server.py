@@ -8,13 +8,20 @@ from requests.api import head, request
 from requests.models import Response
 from requests.structures import CaseInsensitiveDict
 from datetime import datetime
+import tkinter
+from tkinter import Canvas, ttk
+from tkinter.constants import ANCHOR
+from tkinter.messagebox import showinfo
+from tkinter import messagebox
+from PIL import ImageTk,Image
 import threading
 import multiprocessing
 
 # ------ Assign const value -----
 
+ConsoleWidth=70
 buffer = 2048 #buffer send and recv data
-
+ColorCode="#3d4546"
 #Server IP and Port
 ServerIP= '127.0.0.1'
 ServePort=64234
@@ -174,6 +181,7 @@ class Account():
   
     
     def __init__(self):
+        
         self.url_file="Account.json"
         self.url_online_file="AccountLive.json"
         self.user=None
@@ -279,7 +287,7 @@ class Account():
             with open(self.url_online_file,'w') as out_file:
                 out_file.write(json.dumps(current_online,indent=3))
                 out_file.close()
-            
+            #GuiView.AccountOnlineUpdate(self.url_online_file)
         except OSError as err:
             print(err)
         
@@ -295,6 +303,7 @@ class Account():
         with open(self.url_online_file,'w') as out_file:
             out_file.write(json.dumps(current_online,indent=3))
             out_file.close()
+        #GuiView.AccountOnlineUpdate(self.url_online_file)
     
     def Client_Login(self,client_sock,client_IP):
         while True :
@@ -304,7 +313,7 @@ class Account():
                 if(msg=="QUIT"):
                     return False
                 msg = str(msg).split(',')
-                print(msg)
+                #print(msg)
                 # Status_login = client_sock.recv(buffer).decode('utf-8')
                 # print(Status_login)
                 
@@ -543,14 +552,17 @@ def FirstRunningServer():
 
 
 def main():
+    
     os.system("Title "+"Server")
     #FirstRunningServer()
     tcp_server_multi_client=TCPSERVERMULTICLIENT(ServerIP,ServePort)
     tcp_server_multi_client.Config_server()
     tcp_server_multi_client.wait_for_client()
 
+
 if __name__=='__main__':
     main()
+
 
 
 
