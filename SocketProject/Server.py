@@ -26,6 +26,79 @@ ColorCode="#3d4546"
 ServerIP= '127.0.0.1'
 ServePort=64234
 
+def FirstRunningServer():
+
+    with open("AccountLive.json",'w') as out_file:
+        out_file.write(json.dumps({"username":[],"pwd":[],"socket":[]},indent=3))
+        out_file.close()
+
+class GuiServer():
+    
+    def Run(self):
+        self.clientwindow=tkinter.Tk()
+        self.clientwindow.configure(bg = ColorCode)
+        self.clientwindow.geometry("745x450")
+        self.clientwindow.title("Currency Exchange Server")
+        self.clientwindow.iconbitmap('logo.ico')
+        self.Lb1 = tkinter.Listbox(self.clientwindow,width=ConsoleWidth,height=22)
+        self.Lb1.config(background="black", foreground="white")
+        self.Lb1.place(x=225,y=35)
+        self.Lb2 = tkinter.Listbox(self.clientwindow,width=34,height=22)
+        self.Lb2.config(background="white", foreground="black")
+        self.Lb2.place(x=15,y=35)
+        self.lable1=tkinter.Label(self.clientwindow,text="Current Online Users",width=20)
+        self.lable1.config(fg="white", font=("",13,"bold"),bg = ColorCode,anchor="center")
+        self.lable1.place(x=15,y=10)
+        self.lable2=tkinter.Label(self.clientwindow,text="Current Activites",width=int(ConsoleWidth-20),)
+        self.lable2.config(fg="white", font=("",13,"bold"),bg = ColorCode,anchor="center")
+        self.lable2.place(x=226,y=10)
+    
+    def Input1(self,mss):
+        
+        mss = '>>  ' +mss
+        if(len(mss)>ConsoleWidth+10):
+            while(mss!=""):
+                displaymss=mss[:ConsoleWidth+10]
+                self.Lb1.insert(tkinter.END, displaymss)
+                mss=mss[ConsoleWidth+10:]
+        else:
+            self.Lb1.insert(tkinter.END, mss)
+        self.Lb1.insert(tkinter.END,str(" "))    
+        self.Lb1.place(x=225,y=35)
+        self.Lb2.place(x=15,y=35)
+        self.Lb1.yview(tkinter.END)
+        
+
+    def Input2(self,mss):
+    
+        self.Lb2.insert(tkinter.END, mss)
+        self.Lb1.place(x=225,y=35)
+        self.Lb2.place(x=15,y=35)
+        self.Lb2.yview(tkinter.END) 
+        self.Lb1.yview(tkinter.END)
+       
+
+    def AccountOnlineUpdate(self,url):
+     
+        f=open(url)
+        data=json.load(f)
+        self.Lb2.delete(0,tkinter.END)
+        for i in data['username']:
+            self.Input2(i)
+        self.Input1(str(data))
+        f.close()
+       
+
+    def on_closing(self):
+        
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.clientwindow.destroy()
+            FirstRunningServer()
+            return True
+        else:
+            return False
+       
+
 # ------ Get data from api ------
 def Get_time_and_day(): #get current time and date to dict
     
@@ -147,8 +220,8 @@ def Read_File(day):
     except:
         return None
 
-def Find_currency_file(full_data,currency_name=None):
-    print(f"data_at_time: {full_data.get('update_time')}")
+def Find_currency_file(full_data,GUI,currency_name=None):
+    GUI.Input1(f"data_at_time: {full_data.get('update_time')}")
     update_time = f"{full_data.get('update_time')[0].get('day')}/{full_data.get('update_time')[0].get('month')}/{full_data.get('update_time')[0].get('year')} {full_data.get('update_time')[1].get('hour')}:{full_data.get('update_time')[1].get('minute')}:{full_data.get('update_time')[1].get('sec')}"
     
     #searching for currency name
@@ -160,11 +233,11 @@ def Find_currency_file(full_data,currency_name=None):
     return None,update_time
 
 
-def Find_currency(full_data,currency_name=None): #find currency in data
+def Find_currency(full_data,GUI,currency_name=None): #find currency in data
 
     full_data=Update_data(full_data)
     #get latest update time
-    print(f"data_at_time: {full_data.get('update_time')}")
+    GUI.Input1(f"data_at_time: {full_data.get('update_time')}")
     update_time = f"{full_data.get('update_time')[0].get('day')}/{full_data.get('update_time')[0].get('month')}/{full_data.get('update_time')[0].get('year')} {full_data.get('update_time')[1].get('hour')}:{full_data.get('update_time')[1].get('minute')}:{full_data.get('update_time')[1].get('sec')}"
     
     #searching for currency name
@@ -274,7 +347,7 @@ class Account():
 
             return 0 #wrong password 
 
-    def LogOut(self,client_sock,client_IP): #log out
+    def LogOut(self,client_sock,client_IP,GUI): #log out
         
         #get online data
         current_online=self.Read_json_file(self.url_online_file)
@@ -287,25 +360,26 @@ class Account():
             with open(self.url_online_file,'w') as out_file:
                 out_file.write(json.dumps(current_online,indent=3))
                 out_file.close()
-            #GuiView.AccountOnlineUpdate(self.url_online_file)
+            GUI.AccountOnlineUpdate(self.url_online_file)
         except OSError as err:
-            print(err)
+            GUI.Input1(err)
         
-    def LogIn_Success(self,client_sock,client_IP):
+    def LogIn_Success(self,client_sock,client_IP,GUI):
         
         #get file online account data
         current_online =self.Read_json_file(self.url_online_file)
-
+        GUI.AccountOnlineUpdate(self.url_online_file)
         current_online.get('username').append(self.user)
         current_online.get('pwd').append(self.pwd)
         current_online.get('socket').append(str(client_IP[0])+str(client_IP[1]))
+        GUI.Input2(self.user)
         #rewrite opened account file
         with open(self.url_online_file,'w') as out_file:
             out_file.write(json.dumps(current_online,indent=3))
             out_file.close()
-        #GuiView.AccountOnlineUpdate(self.url_online_file)
+        
     
-    def Client_Login(self,client_sock,client_IP):
+    def Client_Login(self,client_sock,client_IP,GUI):
         while True :
             #get status login
             msg =client_sock.recv(buffer).decode('utf-8')
@@ -330,11 +404,11 @@ class Account():
 
                     if self.Register(All_account) == True:
 
-                        self.LogIn_Success(client_sock,client_IP)
+                        self.LogIn_Success(client_sock,client_IP,GUI)
                         client_sock.sendall('Login success'.encode('utf-8'))
                         return True
                     else:
-                        client_sock.sendall('Username already have'.encode('utf-8'))
+                        client_sock.sendall('Username already in'.encode('utf-8'))
 
                 else:   
 
@@ -343,7 +417,7 @@ class Account():
                         Account_status= self.LogIn(All_account)
 
                         if Account_status == 1:
-                            self.LogIn_Success(client_sock,client_IP)
+                            self.LogIn_Success(client_sock,client_IP,GUI)
                             client_sock.sendall('Login success'.encode('utf-8'))
                             return True
 
@@ -361,15 +435,17 @@ class TCPSERVER(Account):
         self.IP=IP
         self.Port=Port
         self.sock=None
+       
         super().__init__()
     #Print to screen
-    def Print_to_Screen(self,msg):
+
+    def Print_to_Screen(self,msg,GUI):
 
         #get time and date
         current_time= datetime.now().strftime('%d-%m %H:%M:%S')
-        print(f'[{current_time}] - recv: {msg}')
+        GUI.Input1(f'[{current_time}] - recv: {msg}')
 
-    def Send_currency_data(self,client_sock,object): # send currency data
+    def Send_currency_data(self,client_sock,object,GUI): # send currency data
     
         resp =f"{object.get('currency')},{object.get('buy_cash')},{object.get('buy_transfer')},{object.get('sell')},"
         # resp=f"{object.get('currency')} \0"
@@ -384,34 +460,37 @@ class TCPSERVER(Account):
         # resp=f"{object.get('sell')} \0"
         # self.Print_to_Screen(resp)
         # client_sock.sendall(resp.encode('utf-8'))
-        self.Print_to_Screen(resp)
+        self.Print_to_Screen(resp,GUI)
         client_sock.sendall(resp.encode('utf-8'))
 
-    def Config_server(self): # config server socket
+    def Config_server(self,GUI): # config server socket
 
         # creating socket TCP
-        self.Print_to_Screen('Creating socket....')
+        self.Print_to_Screen('Creating socket....',GUI)
+        
         self.sock= socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.Print_to_Screen('Socket created')
-
+        self.Print_to_Screen('Socket created',GUI)
+        
         #binding socket
         self.sock.bind((self.IP,self.Port))
 
-        self.Print_to_Screen('Finished Config_server')
+        self.Print_to_Screen('Finished Config_server',GUI)
+     
 
-    def Wait_for_Client(self): # Client listen
+    def Wait_for_Client(self,GUI): # Client listen
         
         # listen and accept connection
         self.sock.listen(1)
         client_sock,client_IP = self.sock.accept()
 
-        self.Print_to_Screen(f'Accepted connection from {client_IP}')
-        self.Handle_client(client_sock,client_IP)
+        self.Print_to_Screen(f'Accepted connection from {client_IP}',GUI)
+     
+        self.Handle_client(client_sock,client_IP,GUI)
 
-    def Handle_client(self,client_sock,client_IP): #handle Client
+    def Handle_client(self,client_sock,client_IP,GUI): #handle Client
           # get data from json file
         
-        if(self.Client_Login(client_sock,client_IP)==True):
+        if(self.Client_Login(client_sock,client_IP,GUI)==True):
 
             
             current_time,current_day=Get_time_and_day()
@@ -445,11 +524,11 @@ class TCPSERVER(Account):
 
 
                             #find currency 
-                                object,update_time =Find_currency(full_data,client_msg)
+                                object,update_time =Find_currency(full_data,GUI,client_msg)
                             else:
                                 full_data_file=Read_File(day)
                                 if(full_data_file!=None):
-                                    object,update_time=Find_currency_file(full_data_file,client_msg)
+                                    object,update_time=Find_currency_file(full_data_file,GUI,client_msg)
                                 else:
                                     update_time ="None"
                                     object=None
@@ -459,14 +538,14 @@ class TCPSERVER(Account):
                             #send if server have that data or not 
                             if object != None:
                                 client_sock.sendall(str('true').encode('utf-8'))
-                                self.Send_currency_data(client_sock=client_sock,object=object)
+                                self.Send_currency_data(client_sock=client_sock,object=object,GUI=GUI)
                             else:
                                 client_sock.sendall(str('false').encode('utf-8'))
 
                         else:
                             
                             # find currency 
-                            object,update_time =Find_currency(full_data)
+                            object,update_time =Find_currency(full_data,GUI)
 
                             # send time update
                             client_sock.sendall(update_time.encode('utf-8'))
@@ -474,94 +553,143 @@ class TCPSERVER(Account):
                             #get number of currency and send to client
                             number= len(full_data.get('results'))
                             client_sock.sendall(str(number).encode('utf-8'))
-                            print(number)
+                            #print(number)
 
                             #send all data to client
                             for no in full_data.get('results'):
-                                self.Send_currency_data(client_sock=client_sock,object=no)
+                                self.Send_currency_data(client_sock=client_sock,object=no,GUI=GUI)
 
                     #receive data from client
                     data_enc =client_sock.recv(buffer)
 
             except OSError as err:
-                self.Print_to_Screen(err)
-            
+                try:
+                    self.Print_to_Screen(err,GUI)
+                except:
+                    print(err)
             finally:
                 
                 #close connection
-                self.Print_to_Screen(f'Closing client socket for {client_IP}')
-                self.LogOut(client_sock,client_IP)
-                client_sock.close()
-                self.Print_to_Screen(f'Closed {client_IP}')
+                try:
+                    self.Print_to_Screen(f'Closing client socket for {client_IP}',GUI)
+                
+                    self.LogOut(client_sock,client_IP,GUI)
+                    client_sock.close()
+                    self.Print_to_Screen(f'Closed {client_IP}',GUI)
+                except:
+                    client_sock.close()
+             
         else:
             #close connection
-            self.Print_to_Screen(f'Closing client socket for {client_IP}')
+            self.Print_to_Screen(f'Closing client socket for {client_IP}',GUI)
             
             client_sock.close()
-            self.Print_to_Screen(f'Closed {client_IP}')   
+            self.Print_to_Screen(f'Closed {client_IP}',GUI)   
+            
 
     def shutdown_server(self):
         
         #shutdown server
-        self.Print_to_Screen('Server shutting down...')
+        
         FirstRunningServer()
         self.sock.close()
 
 # ----- TCP multi client -----
-class TCPSERVERMULTICLIENT(TCPSERVER):
 
+
+class TCPSERVERMULTICLIENT(TCPSERVER,GuiServer):
+     
+    
     def __init__(self,IP,Port):
-        super().__init__(IP,Port)
+        TCPSERVER.__init__(self,IP,Port)
+        self.gui=GuiServer()
+        self.gui.Run()
+        self.Config_server(self.gui)
+        FirstRunningServer()
+        
 
+    def CloseProcess(self):
+        if(self.gui.on_closing() == True):
+            FirstRunningServer()
+            self.shutdown_server()
+            
+        else:
+            FirstRunningServer()
+            self.shutdown_server()
+
+    def CloseButton(self):
+        FirstRunningServer()
+        self.shutdown_server()
+        self.gui.clientwindow.destroy()
+       
+          
     def wait_for_client(self):
 
+    
         try:
+            tkinter.Button(self.gui.clientwindow,text="Shutdown server ", command=self.CloseButton, bg = "#006cbe", fg = 'white',width=12).place(x=15,y=400)
+            tkinter.Button(self.gui.clientwindow,text="Clear List command", command=lambda:self.gui.Lb1.delete(0,tkinter.END), bg = "#006cbe", fg = 'white',width=15).place(x=225,y=400)
+            
+            self.gui.clientwindow.protocol("WM_DELETE_WINDOW",lambda:self.CloseProcess())  
             #listen for client connection
-            self.Print_to_Screen('Listening for connection')
+            self.Print_to_Screen('Listening for connection',self.gui)
             self.sock.listen(10)
 
             while True:
-
+                
                 #accept connection
                 client_sock,client_IP = self.sock.accept()
-                self.Print_to_Screen(f'Accepted connection from {client_IP}')
-
+                self.Print_to_Screen(f'Accepted connection from {client_IP}',self.gui)
+                
                 #threading client
-                client_thread=threading.Thread(target=self.Handle_client,args=(client_sock,client_IP))
+                client_thread=threading.Thread(target=self.Handle_client,args=(client_sock,client_IP,self.gui))
                 client_thread.start()
                 
                 # client_thread=multiprocessing.Process(target=self.Wait_for_Client)
                 # client_thread.start()
-                
+            
         except KeyboardInterrupt:
-           
-            self.shutdown_server()
+            
             FirstRunningServer()
+            self.shutdown_server()
+            
         finally:
+            
             FirstRunningServer()
             self.shutdown_server()
+
+
+
+    def RunGuiAndClient(self):
+       
+        
+        
+        try:
+            Connection_Theading= threading.Thread(target=self.wait_for_client)
+            Connection_Theading.start()
+            
+        except OSError as er:
+            self.gui.Input1(er)
+        self.gui.clientwindow.mainloop() 
 
 # ----- main -----
 
-def FirstRunningServer():
-
-    with open("AccountLive.json",'w') as out_file:
-        out_file.write(json.dumps({"username":[],"pwd":[],"socket":[]},indent=3))
-        out_file.close()
 
 
 
-def main():
+
+def MainFunc():
     
     os.system("Title "+"Server")
     #FirstRunningServer()
     tcp_server_multi_client=TCPSERVERMULTICLIENT(ServerIP,ServePort)
-    tcp_server_multi_client.Config_server()
-    tcp_server_multi_client.wait_for_client()
+    tcp_server_multi_client.Config_server(tcp_server_multi_client.gui)
+    #tcp_server_multi_client.wait_for_client()
+    tcp_server_multi_client.RunGuiAndClient()
 
 
 if __name__=='__main__':
-    main()
+    MainFunc()
 
 
 

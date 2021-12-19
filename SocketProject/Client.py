@@ -31,6 +31,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
     img = ImageTk.PhotoImage(Image.open("main.jpg"))
     canvas.create_image(525,300,image=img)
     canvas.place(x=0,y=0)
+    
     def on_closing():
         #khi bấm nút thoát 
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
@@ -237,13 +238,13 @@ def loginGUI(IPServer,client_sock,server_addr):
         if len(UserInput.get()) !=0 and len(PassInput.get()) !=0:
                 if (loginFail.winfo_exists()):
                     loginFail.destroy()
-                print(f"Username: {UserInput.get()}")
-                print(f"Password: {PassInput.get()}")
-                print(f"Pos: {posInput}") 
+                # print(f"Username: {UserInput.get()}")
+                # print(f"Password: {PassInput.get()}")
+                # print(f"Pos: {posInput}") 
  #-------------------------------------------------------------------               
                 msg=posInput+','+UserInput.get()+','+PassInput.get()
-                print(msg)
-                print(client_sock)
+                # print(msg)
+                # print(client_sock)
                 try:
          
                     client_sock.sendto(msg.encode('utf-8'),server_addr)
@@ -255,7 +256,11 @@ def loginGUI(IPServer,client_sock,server_addr):
                         loginwindow.destroy()
                         ClientGUI(IPServer,client_sock,server_addr)
                     else:
-                        messagebox.askokcancel("OK",resp)
+                        if(resp==""):
+                            messagebox.askokcancel("QUIT","Cannot connect to server") 
+                            client_sock.close()
+                            loginwindow.destroy()
+                            inputServerIP()
                         #loginFail.grid(row=3,column=1,padx=(0,100))
                 except OSError:
                     print("Server disconnected..")
