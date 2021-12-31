@@ -620,6 +620,7 @@ class TCPSERVER(Account):
           
         FirstRunningServer()
         self.sock.close()
+        os._exit(0)
        
 
 # ----- TCP multi client -----

@@ -77,12 +77,13 @@ def ClientGUI(IPServer,client_sock,server_addr):
         try:
 
             clientwindow.destroy()
-            inputServerIP()
+            #inputServerIP()
         except:
             messagebox.askokcancel("QUIT","Cannot connect to server")  
             clientwindow.destroy()
             
-        
+        finally:
+            os._exit(0)
             
 
     def logOut(Popup):
