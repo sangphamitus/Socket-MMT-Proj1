@@ -15,7 +15,8 @@ from tkinter.messagebox import showinfo
 from tkinter import messagebox
 from PIL import ImageTk,Image
 import threading
-import multiprocessing
+import schedule
+import sys
 
 # ------ Assign const value -----
 
@@ -23,7 +24,7 @@ ConsoleWidth=70
 buffer = 2048 #buffer send and recv data
 ColorCode="#3d4546"
 #Server IP and Port
-ServerIP= '127.0.0.1'
+ServerIP= socket.gethostbyname(socket.gethostname())
 ServePort=64234
 
 def FirstRunningServer():
@@ -52,7 +53,14 @@ class GuiServer():
         self.lable2=tkinter.Label(self.clientwindow,text="Current Activites",width=int(ConsoleWidth-20),)
         self.lable2.config(fg="white", font=("",13,"bold"),bg = ColorCode,anchor="center")
         self.lable2.place(x=226,y=10)
+        self.IPlabel=tkinter.Label(self.clientwindow,text="Server ready on :")
+        self.IPlabel.config(fg="white", font=("",13,"bold"),bg = ColorCode,anchor="center")
+        self.IPlabel.place(x=450,y=400)
     
+    def DisplayIP(self,msg):
+        self.IPlabel=tkinter.Label(self.clientwindow,text=f"Server ready on : {msg}")
+        self.IPlabel.config(fg="white", font=("",10,"underline"),bg = ColorCode,anchor="center")
+        self.IPlabel.place(x=420,y=400)
     def Input1(self,mss):
         
         mss = '>>  ' +mss
@@ -174,6 +182,14 @@ def Get_data_from_Json(file_name="ExchangeCurrencyRate.json"): # get data from s
 
     return response
 
+def Update_data_30min():
+    while True:
+        current_time,current_day=Get_time_and_day()
+        filename=f"Data/{current_day['day']}_{current_day['month']}_{current_day['year']}.json"
+        full_data=Get_data_from_Json(filename)
+        Update_data(full_data=full_data)
+
+
 def Update_data(full_data): #Check and update data 
     
     #assign and get date and time
@@ -235,7 +251,7 @@ def Find_currency_file(full_data,GUI,currency_name=None):
 
 def Find_currency(full_data,GUI,currency_name=None): #find currency in data
 
-    full_data=Update_data(full_data)
+    #
     #get latest update time
     GUI.Input1(f"data_at_time: {full_data.get('update_time')}")
     update_time = f"{full_data.get('update_time')[0].get('day')}/{full_data.get('update_time')[0].get('month')}/{full_data.get('update_time')[0].get('year')} {full_data.get('update_time')[1].get('hour')}:{full_data.get('update_time')[1].get('minute')}:{full_data.get('update_time')[1].get('sec')}"
@@ -372,6 +388,8 @@ class Account():
         current_online.get('username').append(self.user)
         current_online.get('pwd').append(self.pwd)
         current_online.get('socket').append(str(client_IP[0])+str(client_IP[1]))
+        
+        
         GUI.Input2(self.user)
         #rewrite opened account file
         with open(self.url_online_file,'w') as out_file:
@@ -443,7 +461,7 @@ class TCPSERVER(Account):
 
         #get time and date
         current_time= datetime.now().strftime('%d-%m %H:%M:%S')
-        GUI.Input1(f'[{current_time}] - recv: {msg}')
+        GUI.Input1(f'[{current_time}] :  {msg}')
 
     def Send_currency_data(self,client_sock,object,GUI): # send currency data
     
@@ -475,6 +493,8 @@ class TCPSERVER(Account):
         self.sock.bind((self.IP,self.Port))
 
         self.Print_to_Screen('Finished Config_server',GUI)
+        self.Print_to_Screen(f'Server ready on : {self.IP} , Port: {self.Port}',GUI)
+        GUI.DisplayIP(f" {self.IP} ,Port: {self.Port}")
      
 
     def Wait_for_Client(self,GUI): # Client listen
@@ -500,11 +520,17 @@ class TCPSERVER(Account):
             full_data=Get_data_from_Json(filename)
             try:
                 # receive request from client
-                data_enc =client_sock.recv(buffer)
-                while data_enc:
-                    
+                
+
+               
+                while True:
+                    data_enc =client_sock.recv(buffer)
                     #get cmd from Client
                     client_msg = data_enc.decode('utf-8')
+                    
+                    if('-' in client_msg):
+                        continue
+                    self.Print_to_Screen(f'Recv msg from {client_sock} : {client_msg} ',GUI)
                     if client_msg =='QUIT':
                         break
                     else:
@@ -521,7 +547,7 @@ class TCPSERVER(Account):
                             day[2]=int(day[2])
                             if(int(day[0])==int(currntday.day) and int(day[1])==int(currntday.month) and int(day[2])==int(currntday.year)):
                             
-
+                           
 
                             #find currency 
                                 object,update_time =Find_currency(full_data,GUI,client_msg)
@@ -566,7 +592,7 @@ class TCPSERVER(Account):
                 try:
                     self.Print_to_Screen(err,GUI)
                 except:
-                    print(err)
+                    self.Print_to_Screen(err,GUI)
             finally:
                 
                 #close connection
@@ -590,9 +616,11 @@ class TCPSERVER(Account):
     def shutdown_server(self):
         
         #shutdown server
-        
+       
+          
         FirstRunningServer()
         self.sock.close()
+       
 
 # ----- TCP multi client -----
 
@@ -638,12 +666,15 @@ class TCPSERVERMULTICLIENT(TCPSERVER,GuiServer):
             while True:
                 
                 #accept connection
-                client_sock,client_IP = self.sock.accept()
-                self.Print_to_Screen(f'Accepted connection from {client_IP}',self.gui)
-                
-                #threading client
-                client_thread=threading.Thread(target=self.Handle_client,args=(client_sock,client_IP,self.gui))
-                client_thread.start()
+                try: 
+                    client_sock,client_IP = self.sock.accept()
+                    self.Print_to_Screen(f'Accepted connection from {client_IP}',self.gui)
+                    
+                    #threading client
+                    client_thread=threading.Thread(target=self.Handle_client,args=(client_sock,client_IP,self.gui))
+                    client_thread.start()
+                except OSError as err:
+                    self.gui.Input1(err)
                 
                 # client_thread=multiprocessing.Process(target=self.Wait_for_Client)
                 # client_thread.start()
@@ -662,10 +693,14 @@ class TCPSERVERMULTICLIENT(TCPSERVER,GuiServer):
 
     def RunGuiAndClient(self):
        
-        
-        
+
         try:
+            Update_thread=threading.Thread(target=Update_data_30min)
+            Update_thread.setDaemon(True)
+            
             Connection_Theading= threading.Thread(target=self.wait_for_client)
+            Connection_Theading.setDaemon(True)
+            Update_thread.start() 
             Connection_Theading.start()
             
         except OSError as er:
@@ -685,6 +720,7 @@ def MainFunc():
     tcp_server_multi_client=TCPSERVERMULTICLIENT(ServerIP,ServePort)
     tcp_server_multi_client.Config_server(tcp_server_multi_client.gui)
     #tcp_server_multi_client.wait_for_client()
+    
     tcp_server_multi_client.RunGuiAndClient()
 
 

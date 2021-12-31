@@ -4,7 +4,7 @@ from tkinter.font import Font, families
 from PIL import Image, ImageTk
 from tkinter import ttk
 from tkinter.constants import ANCHOR
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import askokcancel, showinfo
 from tkinter import messagebox
 from tkinter import Tk, Canvas, Frame, BOTH
 import socket
@@ -12,6 +12,11 @@ import os
 from urllib.request import DataHandler
 import msvcrt
 from datetime import datetime
+import threading
+from Server import Update_data
+import sys
+import time
+
 # ----- Assign const value ----
 
 buffer=2048
@@ -19,14 +24,30 @@ client_Port=64234
 
 # ------ Client  ----
 
-def ClientGUI(IPServer,client_sock,server_addr):
+def RunThread(clientwindow,client_sock,server_addr):
+    
+    while True:
+        time.sleep(1)
+        try:
+            client_sock.sendto(str("-").encode('utf-8'),server_addr)
+        except:
+            messagebox.askokcancel("QUIT","Cannot connect to server")  
+            clientwindow.destroy()
+            sys.exit()
+        
+            
 
+def ClientGUI(IPServer,client_sock,server_addr):
+    
     # tạo console
     clientwindow=tkinter.Tk()
     #clientwindow.configure(bg = "#FFF5E7")
     clientwindow.geometry("1050x600")
     clientwindow.iconbitmap('logo.ico')
     clientwindow.title("Currency Exchange")
+    checkConnect=threading.Thread(target=RunThread,args=(clientwindow,client_sock,server_addr,))
+    checkConnect.setDaemon(True)
+    checkConnect.start()
     canvas= Canvas( clientwindow,width=1050 , height=600)
     img = ImageTk.PhotoImage(Image.open("main.jpg"))
     canvas.create_image(525,300,image=img)
@@ -36,6 +57,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
         #khi bấm nút thoát 
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             clientwindow.destroy()
+          
     def LogOutPopUp():
        # tạo pop up để hỏi logout
         Popup=tkinter.Toplevel(clientwindow)
@@ -51,6 +73,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
     def logOUTfunc(IPServer,client_sock,server_addr):
         client_sock.sendto(str.encode('QUIT'),server_addr)
         client_sock.close()
+        
         try:
 
             clientwindow.destroy()
@@ -58,7 +81,8 @@ def ClientGUI(IPServer,client_sock,server_addr):
         except:
             messagebox.askokcancel("QUIT","Cannot connect to server")  
             clientwindow.destroy()
-       
+            
+        
             
 
     def logOut(Popup):
@@ -140,6 +164,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
 #-------------------------------------------------------------        
         try:
             client_sock.sendto(str.encode(msg),server_addr)
+            Update_time ="None"
             update_time=client_sock.recv(buffer).decode('utf-8')
             print(f'{update_time}')
             confirm =client_sock.recv(buffer).decode('utf-8')            
@@ -151,9 +176,9 @@ def ClientGUI(IPServer,client_sock,server_addr):
                         tree.delete(item)
                     if variable.get() not in contact:
                         contact.append(variable.get())
-                        recev.append((f'{object[0]} ',f'{object[1]}',f'{object[2]}',f'{object[3]}',f'{day}'))
+                        recev.append((f'{object[0]} ',f'{object[1]}',f'{object[2]}',f'{object[3]}',f'{update_time}'))
                     else:
-                        recev[contact.index(variable.get())] = (f'{object[0]} ',f'{object[1]}',f'{object[2]}',f'{object[3]}',f'{day}')
+                        recev[contact.index(variable.get())] = (f'{object[0]} ',f'{object[1]}',f'{object[2]}',f'{object[3]}',f'{update_time}')
 
                 except OSError:
                     messagebox.askokcancel("QUIT","Cannot connect to server") 
@@ -177,7 +202,7 @@ def ClientGUI(IPServer,client_sock,server_addr):
         #     recev.append((f'{variable.get()} ',f'0',f'0',f'0'))
         # else:
         #     recev[contact.index(variable.get())] = (f'{variable.get()} ',f'9',f'9',f'9')
-        if update_time != "None":
+        if update_time != "None" and update_time!="":
             idx=0
             for cont in recev:
                 if idx %2 == 0:
@@ -261,6 +286,8 @@ def loginGUI(IPServer,client_sock,server_addr):
                             client_sock.close()
                             loginwindow.destroy()
                             inputServerIP()
+                        else :
+                            messagebox.askokcancel("LoginErr",resp) 
                         #loginFail.grid(row=3,column=1,padx=(0,100))
                 except OSError:
                     print("Server disconnected..")
@@ -315,12 +342,15 @@ def inputServerIP():
         if(len(ipInp.get())!= 0):
             print(f"IP Server {ipInp.get()}")
             IPServer =ipInp.get()
+            
 #-----------------------------------------------
             print(f'Connecting to Server IP: {IPServer}')
             sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
             try:
                 sock.connect((IPServer,client_Port))
                 window.destroy()
+               
+                
                 loginGUI(IPServer,sock,(IPServer,client_Port))
             except:
                 messagebox.askokcancel("QUIT","Cannot connect to server")  
@@ -343,7 +373,10 @@ def inputServerIP():
     # tạo nút
     tkinter.Button(window,text="Input ", command=show_entry_fields, bg = "#006cbe", fg = 'white',width=12).place(x=200,y=60)
     window.mainloop()
+
+
 def main():
+    
     inputServerIP()
 
 if __name__=='__main__':
